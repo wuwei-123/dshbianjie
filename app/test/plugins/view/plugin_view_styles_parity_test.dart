@@ -8,9 +8,16 @@ import 'package:flutter_test/flutter_test.dart';
 void main() {
   final kit = Directory('../sdk/plugin-kit');
   test('App and SDK agree on v2 diagnostics and 256 quantised colour corrections', () {
-    final process = Process.runSync('node', ['${kit.path}/test/style-parity.mjs']);
-    expect(process.exitCode, 0, reason: '${process.stderr}');
-    final expected = jsonDecode(process.stdout as String) as Map;
+    // Bytes, decoded as UTF-8 here: runSync's default decodes with the host
+    // code page, which mangles the Chinese diagnostic titles on Windows.
+    final process = Process.runSync(
+      'node',
+      ['${kit.path}/test/style-parity.mjs'],
+      stdoutEncoding: null,
+      stderrEncoding: null,
+    );
+    expect(process.exitCode, 0, reason: utf8.decode(process.stderr as List<int>, allowMalformed: true));
+    final expected = jsonDecode(utf8.decode(process.stdout as List<int>)) as Map;
     final inputs = jsonDecode(File('${kit.path}/test/parity/style-inputs.json').readAsStringSync()) as List;
     final results = <Map<String, Object?>>[];
     for (final c in inputs.cast<Map>()) {

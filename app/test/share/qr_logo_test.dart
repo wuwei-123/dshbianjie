@@ -277,7 +277,7 @@ void main() {
       testWidgets('the tile on the centre, one module of plate round it ($size, quiet zone $quietZone)', (
         tester,
       ) async {
-        const data = '';
+        const data = 'https://github.com/ccch1mneyyy/dsh-go/releases/tag/v0.9.15';
         await pump(tester, QrCodeView(data: data, size: size, quietZone: quietZone, logo: true));
         final (code, plate) = QrCodeView.codeFor(data, QrEcc.medium, logo: true, size: size, quietZone: quietZone);
         expect(code.ecc, QrEcc.high);
@@ -313,7 +313,7 @@ void main() {
 
     testWidgets('a code that would be too fine with a logo is drawn plain', (tester) async {
       // 58 bytes: version 6 at H, 1.36 per module on the share card's 64.
-      final data = '';
+      final data = 'https://github.com/ccch1mneyyy/dsh-go/releases/tag/v0.9.15';
       await pump(tester, QrCodeView(data: data, size: 64, quietZone: 3, logo: true));
       expect(find.byKey(QrCodeView.logoKey), findsNothing);
       expect(QrCodeView.codeFor(data, QrEcc.medium, logo: true, size: 64, quietZone: 3).$1.ecc, QrEcc.medium);

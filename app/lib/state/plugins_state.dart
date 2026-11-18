@@ -230,11 +230,11 @@ final marketCatalogProvider = FutureProvider<MarketCatalog>((ref) async {
 /// one pinned version per plugin, and the dsh边界 sidecar (`dsh-go.json`)
 /// beside it, read from [officialMarketBases]. Wherever it was read, the
 /// index is the Worker's (this URL resolves its links).
-const officialIndexUrl = '';
+const officialIndexUrl = 'https://go.dshtui.com/market/index.json';
 
 /// Where both files are read, in turn: the public bucket the Worker's cron
 /// writes (no Worker request), then the Worker.
-const officialMarketBases = ['https://dl.dshtui.com/market/', ''];
+const officialMarketBases = ['https://dl.dshtui.com/market/', 'https://go.dshtui.com/market/'];
 
 /// How long the copy on the phone is used without asking the server.
 const officialMarketFresh = Duration(hours: 6);

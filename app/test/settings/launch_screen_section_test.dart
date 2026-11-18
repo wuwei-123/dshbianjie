@@ -4,6 +4,7 @@
 //
 //   flutter test --update-goldens test/settings/launch_screen_section_test.dart
 
+import 'dart:convert';
 import 'dart:io';
 import 'dart:ui' as ui;
 
@@ -92,11 +93,10 @@ void main() {
 
   Future<void> pump(WidgetTester tester, {CustomLaunch? stored, Brightness brightness = Brightness.light}) async {
     SharedPreferences.setMockInitialValues({
-      if (stored != null)
-        CustomLaunch.prefsKey:
-            '{"kind":"${stored.kind.name}","path":"${stored.path}",'
-            '"width":${stored.width},"height":${stored.height},"fit":"${stored.fit.name}",'
-            '"backdrop":"${stored.backdrop.name}","on":${stored.on}${stored.edge == null ? '' : ',"edge":${stored.edge}'}}',
+      // Through jsonEncode: a Windows temp path (`C:\Users\…`) is not a legal
+      // string literal, and the hand-written form this replaced failed to
+      // parse there (`\U` is not an escape) long before it reached the widget.
+      if (stored != null) CustomLaunch.prefsKey: jsonEncode(stored.toJson()),
     });
     usePhoneSurface(tester);
     await tester.pumpWidget(

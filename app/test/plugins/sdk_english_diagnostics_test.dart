@@ -18,6 +18,9 @@ void main() {
     final cases = jsonDecode(inputs.readAsStringSync()) as List;
     late final ProcessResult node;
     try {
+      // stdout as bytes, decoded here as UTF-8: Process.run's default decodes
+      // with the host code page, which mangles the Chinese titles on Windows
+      // (and the mangled bytes then fail jsonDecode).
       node = await Process.run('node', [
         '--input-type=module',
         '-e',
@@ -27,7 +30,7 @@ const cases = JSON.parse(fs.readFileSync(process.argv[2], 'utf8'));
 process.stdout.write(JSON.stringify(cases.map(c => ({name:c.name, ...checkView(c.view, {budget:c.budget, data:c.data, lang:'en'})}))));''',
         Uri.file('${kit.path}/lib/view-check.js').toString(),
         inputs.path,
-      ]);
+      ], stdoutEncoding: null, stderrEncoding: null);
     } on ProcessException catch (error) {
       // ENOENT: this optional cross-runtime check needs a Node executable.
       // Permission errors and a Node process that starts but fails stay errors.
@@ -35,8 +38,8 @@ process.stdout.write(JSON.stringify(cases.map(c => ({name:c.name, ...checkView(c
       markTestSkipped('Node.js executable "node" is unavailable on PATH; live SDK/App parity needs Node.');
       return;
     }
-    expect(node.exitCode, 0, reason: '${node.stderr}');
-    final reports = jsonDecode(node.stdout as String) as List;
+    expect(node.exitCode, 0, reason: utf8.decode(node.stderr as List<int>, allowMalformed: true));
+    final reports = jsonDecode(utf8.decode(node.stdout as List<int>)) as List;
     expect(reports.length, cases.length);
     for (var i = 0; i < cases.length; i++) {
       final c = cases[i] as Map;

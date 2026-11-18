@@ -5,6 +5,7 @@
 //
 //   flutter test --update-goldens test/settings/wallpaper_section_test.dart
 
+import 'dart:convert';
 import 'dart:io';
 import 'dart:ui' as ui;
 
@@ -163,7 +164,10 @@ void main() {
       expect(find.text('调整位置'), findsOneWidget);
       expect(find.text('壁纸已更换'), findsOneWidget);
       final prefs = await SharedPreferences.getInstance();
-      expect(prefs.getString(CustomWallpaper.prefsKey), contains(copy.path));
+      // Compared after decoding: the JSON escapes the path (`C:\\Users\\…`),
+      // so a raw substring test never matched a Windows temp path.
+      final raw = prefs.getString(CustomWallpaper.prefsKey);
+      expect(raw == null ? null : (jsonDecode(raw) as Map)['path'], copy.path);
     });
 
     testWidgets('a refused file says why; nothing changes', (tester) async {

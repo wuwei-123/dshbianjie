@@ -100,7 +100,13 @@ void main() {
         expect(tester.takeException(), isNull, reason: 'late completion must not read a disposed widget ref');
         expect(container!.read(customLaunchProvider).value?.path, success ? image.path : null);
         final prefs = await SharedPreferences.getInstance();
-        expect(prefs.getString(CustomLaunch.prefsKey), success ? contains(image.path) : isNull);
+        final stored = prefs.getString(CustomLaunch.prefsKey);
+        // Decoded, not a substring match: the JSON holds the path escaped
+        // (`C:\\Users\\…`), so `contains(image.path)` never matched on Windows.
+        expect(
+          stored == null ? null : CustomLaunch.fromJson(jsonDecode(stored))?.path,
+          success ? image.path : null,
+        );
       } finally {
         // Release the input even when a preceding assertion fails; no predicted
         // native-success gate or timeout is needed to join this real seam.

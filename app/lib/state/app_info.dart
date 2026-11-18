@@ -30,12 +30,12 @@ abstract final class AppInfo {
   static String get slogan => appL10n.appSlogan;
 
   /// The original dsh边界 author and their personal profiles, not project pages.
-  static const author = '';
-  static const authorBilibiliName = '';
-  static const authorBilibiliUrl = '';
-  static const authorXHandle = '';
-  static const authorXUrl = '';
-  static const authorGithubUrl = '';
+  static const author = 'ccch1mneyyy';
+  static const authorBilibiliName = 'ccchimneyyy';
+  static const authorBilibiliUrl = 'https://b23.tv/9WBns6Y';
+  static const authorXHandle = '@cccch1mneyyyy';
+  static const authorXUrl = 'https://x.com/cccch1mneyyyy';
+  static const authorGithubUrl = 'https://github.com/ccch1mneyyy';
 
   static const deepseekPlatform = 'https://platform.deepseek.com/api_keys';
   static const remoteConsole = 'https://dsh.r2049.cn/app';

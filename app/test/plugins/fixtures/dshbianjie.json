@@ -7,7 +7,7 @@
       "tier": "official",
       "title": { "zh": "生图生视频", "en": "Images & video" },
       "summary": { "zh": "在对话里用即梦、通义万相等服务生成图片和视频。", "en": "Generate images and video in chat with Seedream, Wan and more." },
-      "screenshots": ["-1.png", "-2.png"],
+      "screenshots": ["https://go.dshtui.com/market/shots/media-1.png", "https://go.dshtui.com/market/shots/media-2.png"],
       "dshbianjie": { "adapted": true, "minApp": "1.0.2", "features": ["native-cards", "settings-page", "media"] },
       "risk": { "level": "low", "flags": ["network"] },
       "integrity": "sha512-PSuDPoFvKviy7uSw5my2V+01pE+xnYQz5H5I8lH99R71O3QI0GHTTeKddEZS+/GK7HqhQkEjbvhlsxKoui2/KQ==",

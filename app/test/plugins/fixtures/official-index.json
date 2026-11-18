@@ -14,8 +14,8 @@
       "title": { "en": "Images & video", "zh": "生图生视频" },
       "description": { "en": "Generate images and video in chat", "zh": "在对话里生成图片和视频" },
       "author": "dsh边界",
-      "homepage": "%40dsh-go%2Fmedia",
-      "repository": { "url": "" },
+      "homepage": "https://go.dshtui.com/p/%40dsh-go%2Fmedia",
+      "repository": { "url": "https://github.com/ccch1mneyyy/dsh-media" },
       "metadata": { "category": "media", "keywords": ["生图", "视频", "image", "video"] },
       "versions": [
         { "version": "0.2.0", "publishTimestamp": 1793350000, "source": { "type": "npm" }, "engines": { "dsh": ">=0.2.1" } }

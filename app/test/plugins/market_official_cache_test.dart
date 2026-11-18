@@ -15,7 +15,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'support/fake_plugin_host.dart';
 
 const _dl = 'https://dl.dshtui.com/market/';
-const _go = '';
+const _go = 'https://go.dshtui.com/market/';
 
 /// Both bases with the fixtures; a file missing for a base is 404. ETags are
 /// the body's hash; [down] bases throw like an unreachable host.

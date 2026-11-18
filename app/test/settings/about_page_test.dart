@@ -30,10 +30,14 @@ class _StarStore implements StarPromptStore {
 }
 
 const _profiles = [
-  ('about-author-bilibili', ''),
-  ('about-author-x', ''),
-  ('about-author-github', ''),
+  ('about-author-bilibili', 'https://b23.tv/9WBns6Y'),
+  ('about-author-x', 'https://x.com/cccch1mneyyyy'),
+  ('about-author-github', 'https://github.com/ccch1mneyyy'),
 ];
+
+/// The disclaimer exactly as the app ships it, in [english] or Chinese.
+String _disclaimer(bool english) =>
+    lookupL10n(english ? AppLocale.en : AppLocale.zhCN).stateAppDisclaimer;
 
 void main() {
   late List<Uri> opened;
@@ -101,10 +105,10 @@ void main() {
         await pump(tester, locale: locale, brightness: brightness, scale: 1.3);
         final english = locale == AppLocale.en;
         expect(find.text(english ? 'Original author of dsh边界' : 'dsh边界 原作者'), findsOneWidget);
-        expect(find.text(''), findsOneWidget);
-        expect(find.text(''), findsOneWidget);
-        expect(find.text(''), findsOneWidget);
-        expect(find.text('@'), findsOneWidget);
+        expect(find.text('ccch1mneyyy'), findsOneWidget);
+        expect(find.text('ccchimneyyy'), findsOneWidget);
+        expect(find.text('@cccch1mneyyyy'), findsOneWidget);
+        expect(find.text('@ccch1mneyyy'), findsOneWidget);
         expect(find.text('1.0.2 (42)'), findsOneWidget);
         expect(find.byKey(const ValueKey('settings-star')), findsOneWidget);
         expect(find.text(english ? 'Bilibili profile' : 'B站主页'), findsOneWidget);
@@ -119,9 +123,10 @@ void main() {
           expect(tester.widget<SettingsTile>(row).onTap, isNotNull);
           expect(tester.takeException(), isNull, reason: 'No overflow at $key');
         }
-        final disclaimer = find.text(
-          english ? 'Built on DeepSeek Harness · Unofficial DeepSeek app' : '基于 DeepSeek Harness 构建 · 非 DeepSeek 官方应用',
-        );
+        // The wording comes from the shipped strings, not a copy of them: this
+        // build's disclaimer names the fork, and a hard-coded copy here would
+        // silently stop testing the row it is looking for.
+        final disclaimer = find.text(_disclaimer(english));
         await tester.ensureVisible(disclaimer);
         await tester.pumpAndSettle();
         expect(disclaimer.hitTestable(), findsOneWidget);
@@ -142,7 +147,7 @@ void main() {
   testWidgets('the separate project star still opens the repository', (tester) async {
     await pump(tester);
     await tap(tester, 'settings-star');
-    expect(opened.map((uri) => uri.toString()), ['']);
+    expect(opened.map((uri) => uri.toString()), ['https://github.com/ccch1mneyyy/dsh-go']);
     expect(store.writes.last.finished, isTrue);
   });
 
@@ -156,7 +161,7 @@ void main() {
     opener = (_) async => false;
     await pump(tester);
     await tap(tester, 'about-author-bilibili');
-    expect(clipboard, '');
+    expect(clipboard, 'https://b23.tv/9WBns6Y');
     expect(find.text('没能打开浏览器，网址已复制'), findsOneWidget);
     expect(store.writes, isEmpty);
   });

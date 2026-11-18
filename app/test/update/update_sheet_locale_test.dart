@@ -26,11 +26,11 @@ ReleaseInfo _release({String notes = _both, Map<String, String>? byLocale}) => p
   'assets': {
     'arm64': {
       'name': 'dsh-go-0.9.2-arm64.apk',
-      'url': '-go-0.9.2-arm64.apk',
+      'url': 'https://go.dshtui.com/beta/0.9.2/dsh-go-0.9.2-arm64.apk',
       'size': 1,
     },
   },
-}, base: Uri.parse(''));
+}, base: Uri.parse('https://go.dshtui.com/beta/'));
 
 class _Offer extends AppUpdateController {
   _Offer(this.release);
