@@ -83,24 +83,20 @@ def make_launcher(src: Image.Image, size: int, rounded: bool) -> Image.Image:
 
 
 def make_foreground(src: Image.Image, size: int) -> Image.Image:
-    """adaptive icon 前景：108dp 画布，内容只占中央安全区。
+    """Deprecated: an adaptive icon's foreground must be the glyph alone.
 
-    Android 规范：108dp 画布，系统只会显示中央 72dp（部分 launcher 显示 66dp）。
-    内容超出去就会被裁掉，所以图形必须落在中央 72/108 以内。
+    This used to paste the whole finished icon - dark rounded tile, border and
+    glyph - into the foreground layer. An adaptive icon is two layers: the
+    background gradient (res/drawable/ic_launcher_<theme>_background.xml) and
+    a foreground that is the glyph on transparency. Pasting the tile covered
+    the gradient, and copying it onto frost/ink/night gave all four themes the
+    same dark picture - the glyph vanished on the two dark backgrounds.
 
-    但源图本身已经是「圆角方块 + 内边距」的完整图标，若再按 72/108 缩，
-    会变成「大画布上的小图标」，真机上比邻座 app 小一圈。
-    因此这里按 84/108 摆放：略超 72dp 安全区，但仍在常见 launcher 的
-    圆形/圆角裁切范围内（裁切半径通常到 76-80dp），视觉大小与常规 app 一致。
+    The foregrounds are produced by tools/make_icon_foregrounds.py instead.
+    This function is kept so older callers still import, and returns an empty
+    transparent layer so a stray call cannot paint over the gradient again.
     """
-    canvas = Image.new("RGBA", (size, size), (0, 0, 0, 0))
-    inner = int(size * 84 / 108)
-    art = src.resize((inner, inner), Image.LANCZOS)
-    # 圆角而非正圆：本图标是圆角方块风格，正圆会切掉四角线条
-    art.putalpha(rounded_mask(inner, radius_ratio=0.225))
-    off = (size - inner) // 2
-    canvas.paste(art, (off, off), art)
-    return canvas
+    return Image.new("RGBA", (size, size), (0, 0, 0, 0))
 
 
 def main() -> int:
@@ -130,35 +126,37 @@ def main() -> int:
         total += 1
         print(f"  {dens:<16} ic_launcher_round.png      {l_size}x{l_size}")
 
-        # 3) adaptive 前景
-        p = os.path.join(d, "ic_launcher_foreground.png")
-        make_foreground(src, f_size).save(p, optimize=True)
-        total += 1
-        print(f"  {dens:<16} ic_launcher_foreground.png {f_size}x{f_size}")
+        # 3) adaptive 前景: not this script's job any more.
+        #
+        # The foreground must be the glyph alone on transparency, tinted to read
+        # on each theme's background gradient. This script pasted the finished
+        # tile into it, which covered the gradient; tools/make_icon_foregrounds.py
+        # writes the foregrounds now.
+        print(f"  {dens:<16} ic_launcher_foreground.png  -> tools/make_icon_foregrounds.py")
 
     print()
     print(f"已替换 {total} 个图标文件")
 
-    # 主题变体：frost / ink / night 三套是先前的品牌方案。
-    # 新品牌只有一套视觉，把它们指向同一份资源，避免残留旧鲸鱼图标。
+    # 主题变体：先前的品牌方案只保留一份方形图标。
+    # The *foreground* is deliberately not copied between themes any more: ink
+    # and night have dark background gradients, so a shared dark foreground made
+    # the glyph invisible. tools/make_icon_foregrounds.py tints each theme.
     print()
-    print("主题变体同步（frost/ink/night -> 同一份新图标）:")
+    print("主题变体同步（frost/ink/night 方形+圆形 -> 同一份）:")
     for dens, (l_size, f_size) in DENSITIES.items():
         d = os.path.join(RES, dens)
         base = os.path.join(d, "ic_launcher.png")
         base_round = os.path.join(d, "ic_launcher_round.png")
-        base_fg = os.path.join(d, "ic_launcher_foreground.png")
         for theme in ("frost", "ink", "night"):
             for target, source in (
                 (f"ic_launcher_{theme}.png", base),
                 (f"ic_launcher_{theme}_round.png", base_round),
-                (f"ic_launcher_{theme}_foreground.png", base_fg),
             ):
                 tp = os.path.join(d, target)
                 if os.path.exists(tp):
                     shutil.copyfile(source, tp)
                     total += 1
-        print(f"  {dens:<16} 三套主题已同步")
+        print(f"  {dens:<16} 三套主题已同步（前景另见 make_icon_foregrounds.py）")
     print()
     print(f"合计写入 {total} 个文件")
     return 0

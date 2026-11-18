@@ -12,3 +12,7 @@ GeneratedPluginRegistrant.java
 key.properties
 **/*.keystore
 **/*.jks
+# make-release-key.py renames the replaced keystore to *.tmp-backup; the two
+# patterns above only match the extension, so a backup would slip through.
+**/*.keystore.*
+**/*.jks.*
