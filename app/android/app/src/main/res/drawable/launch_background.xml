@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Launch window background: the brand poster, shown full-bleed.
+     Android 12+ draws the system splash first (icon on the window background), so the
+     poster appears right after it; older versions show this window directly.
+     Dart's first frame paints the same poster (see app/lib/launch/), so the switch
+     from the window to Flutter is seamless. -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Solid fallback, matches the poster's edge colour so no white flashes. -->
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="#FF111115" />
+        </shape>
+    </item>
+    <!-- The poster itself: centred, filled to the screen (crop) so no letterboxing
+         on any aspect ratio. The artwork is a centred composition, so cropping the
+         long edges keeps it intact. -->
+    <item>
+        <bitmap
+            android:gravity="fill"
+            android:src="@drawable/launch_background_image" />
+    </item>
+</layer-list>

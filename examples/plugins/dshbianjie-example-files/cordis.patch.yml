@@ -1,0 +1,4 @@
+# dsh plugin --profile web add /path/to/dshbianjie-example-files
+- insert:
+    - id: dshbianjie-example-files
+      name: dshbianjie-example-files

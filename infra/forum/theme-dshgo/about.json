@@ -1,0 +1,9 @@
+{
+  "name": "dsh边界 分享码卡片",
+  "component": true,
+  "authors": "dsh边界",
+  "theme_version": "1.0.0",
+  "minimum_discourse_version": "3.4.0",
+  "assets": {},
+  "modifiers": {}
+}
