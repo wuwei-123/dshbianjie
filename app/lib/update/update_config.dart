@@ -38,14 +38,24 @@ Uri githubLatestAsset(String name) => Uri.parse('https://github.com/$updateRepo/
 Uri githubReleaseAsset(String tag, String name) =>
     Uri.parse('https://github.com/$updateRepo/releases/download/$tag/$name');
 
-/// The share host (services/share-worker). It serves the beta channel under
-/// `/beta/`; public files come from [updateDownloadOrigin].
-const updateMirrorOrigin = 'https://go.dshtui.com';
+/// Our public copy of the release files (a bucket): `/update.json`, the latest
+/// public manifest with absolute asset URLs, and `/download/<version>/<file>`
+/// for every file of every release.
+///
+/// Empty in this build. Upstream shipped `https://dl.dshtui.com`, the dsh-go
+/// author's bucket, which still serves their 1.3.0 manifest (228 MB). Asking it
+/// first would offer an upgrade to somebody else's APK on every check, and the
+/// signature check at install time would then refuse it - an update that always
+/// fails. This fork has no bucket of its own, so the GitHub release is the only
+/// source; set `--dart-define=DSH_UPDATE_MIRROR=https://...` to add a copy.
+const updateDownloadOrigin = '';
 
-/// Our public copy of the release files (an R2 bucket): `/update.json`, the
-/// latest public manifest with absolute asset URLs, and
-/// `/download/<version>/<file>` for every file of every release.
-const updateDownloadOrigin = 'https://dl.dshtui.com';
+/// Tried before the mirrors when a build carries a channel token.
+///
+/// Empty for the same reason: `<origin>/beta/update.json` is the upstream
+/// author's channel. Without a token no build asks for it anyway; this keeps
+/// one from being pointed at a host we do not control.
+const updateMirrorOrigin = '';
 
 /// The beta channel: `<origin>/beta/update.json` and `<origin>/beta/<version>/<file>`,
 /// both behind `Authorization: Bearer <token>`. The token is compiled into beta

@@ -18,12 +18,13 @@ import 'support.dart';
 
 const _token = 'dshc_0123456789abcdefghijklmnopqrstuvwxyzABCDEFG';
 const _auth = 'Bearer $_token';
-const _feed = 'https://go.dshtui.com/beta/update.json';
+const _origin = 'https://beta.example.com';
+const _feed = '$_origin/beta/update.json';
 const _api = 'https://api.github.com/repos/wuwei-123/dshbianjie/releases/latest';
 const _apk = 'dsh-go-1.2.0-arm64.apk';
-const _betaApk = 'https://go.dshtui.com/beta/1.2.0/$_apk';
+const _betaApk = '$_origin/beta/1.2.0/$_apk';
 const _githubApk = 'https://github.com/wuwei-123/dshbianjie/releases/download/v1.2.0/$_apk';
-const _dlFeed = 'https://dl.dshtui.com/update.json';
+const _dlFeed = 'https://mirror.example.com/update.json';
 
 final _bytes = utf8.encode('PK pretend this is the 1.2.0 beta for arm64');
 
@@ -34,7 +35,7 @@ String _manifest({List<int>? apk}) => jsonEncode({
   'tag': 'v1.2.0',
   'notes': '### 中文\n\n- 内测\n\n### English\n\n- Beta',
   'notesByLocale': {'zh': '- 内测', 'en': '- Beta'},
-  'page': 'https://go.dshtui.com/beta',
+  'page': '$_origin/beta',
   'assets': {
     'arm64': {
       'name': _apk,
@@ -55,24 +56,24 @@ Route _guarded(Route inner) => (url, headers) {
 void _expectTokenOnlyOnChannel(FakeHttp http) {
   for (final (url, headers) in http.requests) {
     final carries = headers.values.any((v) => v.contains(_token));
-    expect(carries, url.host == 'go.dshtui.com' && url.path.startsWith('/beta/'), reason: '$url');
+    expect(carries, url.host == 'beta.example.com' && url.path.startsWith('/beta/'), reason: '$url');
   }
 }
 
 void main() {
-  final sources = buildUpdateSources(channelToken: _token);
+  final sources = buildUpdateSources(channelToken: _token, channelOrigin: _origin, mirror: 'https://mirror.example.com');
 
   group('channel', () {
     test('needs a token and an HTTPS origin', () {
       expect(UpdateChannel.tryCreate(token: ''), isNull);
       expect(UpdateChannel.tryCreate(token: '  '), isNull);
-      expect(UpdateChannel.tryCreate(token: _token, origin: 'http://go.dshtui.com'), isNull);
-      expect(UpdateChannel.tryCreate(token: _token, origin: 'https://go.dshtui.com/beta'), isNull);
+      expect(UpdateChannel.tryCreate(token: _token, origin: 'http://beta.example.com'), isNull);
+      expect(UpdateChannel.tryCreate(token: _token, origin: 'https://beta.example.com/beta'), isNull);
       expect(
         UpdateChannel.tryCreate(token: _token, origin: 'http://127.0.0.1:8787')!.manifest.toString(),
         'http://127.0.0.1:8787/beta/update.json',
       );
-      final channel = UpdateChannel.tryCreate(token: ' $_token\n', origin: 'https://go.dshtui.com/')!;
+      final channel = UpdateChannel.tryCreate(token: ' $_token\n', origin: '$_origin/')!;
       expect(channel.manifest.toString(), _feed);
       expect(channel.headers, {'authorization': _auth});
       expect(channel.toString(), isNot(contains(_token)));
@@ -83,12 +84,12 @@ void main() {
       expect(channel.covers(Uri.parse(_betaApk)), isTrue);
       expect(channel.covers(Uri.parse(_feed)), isTrue);
       for (final other in [
-        'http://go.dshtui.com/beta/1.2.0/$_apk',
-        'https://go.dshtui.com:8443/beta/1.2.0/$_apk',
+        'http://beta.example.com/beta/1.2.0/$_apk',
+        'https://beta.example.com:8443/beta/1.2.0/$_apk',
         'https://evil.example/beta/1.2.0/$_apk',
-        'https://go.dshtui.com.evil.example/beta/x.apk',
-        'https://go.dshtui.com/download/1.2.0/$_apk',
-        'https://go.dshtui.com/beta',
+        'https://beta.example.com.evil.example/beta/x.apk',
+        'https://beta.example.com/download/1.2.0/$_apk',
+        'https://beta.example.com/beta',
         _githubApk,
       ]) {
         expect(channel.covers(Uri.parse(other)), isFalse, reason: other);
@@ -115,13 +116,13 @@ void main() {
       final urls = sources.downloadUrls([Uri.parse(_betaApk), Uri.parse(_githubApk)]);
       expect(urls.map((u) => u.url.toString()), [
         _betaApk,
-        'https://dl.dshtui.com/download/1.2.0/$_apk',
+        'https://mirror.example.com/download/1.2.0/$_apk',
         _githubApk,
         'https://ghfast.top/$_githubApk',
         'https://gh-proxy.com/$_githubApk',
       ]);
       expect(urls.first.headers, {'authorization': _auth});
-      expect(urls.first.label, 'go.dshtui.com');
+      expect(urls.first.label, 'beta.example.com');
       expect(urls.skip(1).every((u) => u.headers.isEmpty), isTrue);
     });
   });
@@ -137,7 +138,7 @@ void main() {
       expect(found.endpoint.mirrorId, isNull);
       expect(found.release.version.toString(), '1.2.0+10261200');
       expect(found.release.apks[ApkFlavor.arm64]!.url.toString(), _betaApk);
-      expect(found.release.pageUrl.toString(), 'https://go.dshtui.com/beta');
+      expect(found.release.pageUrl.toString(), '$_origin/beta');
     });
 
     test('the channel refuses (token revoked) or is down: the public sources answer, without the token', () async {
@@ -198,7 +199,7 @@ void main() {
     });
 
     test('SHA256SUMS from the channel carries the token', () async {
-      const sums = 'https://go.dshtui.com/beta/1.2.0/SHA256SUMS';
+      const sums = '$_origin/beta/1.2.0/SHA256SUMS';
       final hex = sha256.convert(_bytes).toString();
       final http = FakeHttp({sums: _guarded((_, _) => textResponse('$hex  $_apk\n'))});
       expect(await fetchSha256FromSums(http, sources.downloadUrls([Uri.parse(sums)]), _apk), hex);
@@ -241,7 +242,7 @@ void main() {
       expect(c.read(appUpdateProvider).latest!.version.name, '1.2.0');
       await controller.startDownload();
       expect(c.read(appUpdateProvider).task, UpdateTaskPhase.ready);
-      expect(c.read(appUpdateProvider).source, 'go.dshtui.com');
+      expect(c.read(appUpdateProvider).source, 'beta.example.com');
       await controller.install();
       expect(installer.calls, containsAllInOrder(['inspect', 'install']));
       expect(http.urls, [_feed, _betaApk]);

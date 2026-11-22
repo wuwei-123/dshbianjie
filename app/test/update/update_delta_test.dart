@@ -27,8 +27,9 @@ import 'support.dart';
 const _version = '1.2.0+11011200';
 const _apk = 'dsh-go-1.2.0-arm64.apk';
 const _patchName = 'dsh-go-1.0.0-to-1.2.0-arm64.dshdlt';
-const _feed = 'https://dl.dshtui.com/update.json';
-const _dl = 'https://dl.dshtui.com/download/1.2.0';
+const _mirrorOrigin = 'https://mirror.example.com';
+const _feed = '$_mirrorOrigin/update.json';
+const _dl = '$_mirrorOrigin/download/1.2.0';
 const _github = 'https://github.com/wuwei-123/dshbianjie/releases/download/v1.2.0';
 
 final _old = utf8.encode('PK the installed 1.0.0, ${'resources ' * 300}${'classes ' * 300}');
@@ -96,7 +97,7 @@ void main() {
       overrides: [
         updateHttpProvider.overrideWithValue(http),
         updateInstallerProvider.overrideWithValue(installer),
-        updateSourcesProvider.overrideWithValue(buildUpdateSources()),
+        updateSourcesProvider.overrideWithValue(buildUpdateSources(mirror: _mirrorOrigin)),
         updateClockProvider.overrideWithValue(() => DateTime(2026, 11, 2, 9)),
         updateFlavorNameProvider.overrideWithValue('arm64'),
         updateDirectoryProvider.overrideWithValue(() async => downloads()),
@@ -127,7 +128,7 @@ void main() {
     state = c.read(appUpdateProvider);
     expect(state.task, UpdateTaskPhase.ready);
     expect(state.total, _patch.length);
-    expect(state.source, 'dl.dshtui.com');
+    expect(state.source, 'mirror.example.com');
     expect(built().readAsBytesSync(), _new);
     expect(downloads().listSync().map((f) => f.uri.pathSegments.last), [_apk], reason: 'the patch is gone');
     expect(asked(_apk), isEmpty);

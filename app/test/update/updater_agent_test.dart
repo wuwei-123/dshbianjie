@@ -17,7 +17,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'support.dart';
 
 const _token = 'dshc_0123456789abcdefghijklmnopqrstuvwxyzABCDEFG';
-const _feed = 'https://go.dshtui.com/beta/update.json';
+const _origin = 'https://beta.example.com';
+const _feed = '$_origin/beta/update.json';
 const _agent = 'dsh-app-updater/0.9.9+10301000 (arm64-v8a)';
 
 /// The share host's reading of it (services/share-worker/src/stats.ts).
@@ -51,7 +52,7 @@ void main() {
   test('only the beta channel hears the version and ABI', () async {
     // The channel is down: the check goes on to GitHub.
     final http = FakeHttp({_feed: (_, _) => textResponse('', status: 503)});
-    final checker = UpdateChecker(http: http, sources: buildUpdateSources(channelToken: _token), userAgent: _agent);
+    final checker = UpdateChecker(http: http, sources: buildUpdateSources(channelToken: _token, channelOrigin: _origin), userAgent: _agent);
     await checker.check();
     expect(http.requests.length, greaterThan(1));
     for (final (url, headers) in http.requests) {
@@ -71,7 +72,7 @@ void main() {
         updateInstallerProvider.overrideWithValue(
           FakeInstaller(app: const InstalledApp(versionName: '0.9.9', versionCode: 10301000, abi: 'arm64')),
         ),
-        updateSourcesProvider.overrideWithValue(buildUpdateSources(channelToken: _token)),
+        updateSourcesProvider.overrideWithValue(buildUpdateSources(channelToken: _token, channelOrigin: _origin)),
         updateClockProvider.overrideWithValue(() => DateTime(2026, 10, 30, 9)),
         updateFlavorNameProvider.overrideWithValue('arm64'),
         updateDirectoryProvider.overrideWithValue(() async => dir),
