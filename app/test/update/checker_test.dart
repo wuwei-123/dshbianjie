@@ -119,7 +119,7 @@ void main() {
       // The beta channel still says 1.0.4 while GitHub has 1.2.0 (the shape of
       // the 1.0.4 "you are up to date" reports).
       const stale = '{"schema":1,"version":"1.0.4+10310405","tag":"v1.0.4",'
-          '"assets":{"arm64":{"name":"dsh-go-1.0.4-arm64.apk","size":14,'
+          '"assets":{"arm64":{"name":"dshbianjie-1.0.4-arm64.apk","size":14,'
           '"sha256":"3a8498bcf7d895bac5c9f2f02829c9ec7064cd8bc7ef9f1792f28277d44839f2"}}}';
       final http = FakeHttp({
         _m1: (_, _) => textResponse(stale),
@@ -137,7 +137,7 @@ void main() {
 
     test('nothing newer anywhere: the newest answer is returned, not a failure', () async {
       const stale = '{"schema":1,"version":"1.0.4+10310405","tag":"v1.0.4",'
-          '"assets":{"arm64":{"name":"dsh-go-1.0.4-arm64.apk","size":14,'
+          '"assets":{"arm64":{"name":"dshbianjie-1.0.4-arm64.apk","size":14,'
           '"sha256":"3a8498bcf7d895bac5c9f2f02829c9ec7064cd8bc7ef9f1792f28277d44839f2"}}}';
       final http = FakeHttp({
         _api: (_, _) => textResponse(stale),

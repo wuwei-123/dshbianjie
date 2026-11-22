@@ -17,7 +17,7 @@ const _m1 = UpdateMirror(id: 'm1', label: 'mirror-one.example', prefix: 'https:/
 const _sources = UpdateSources(mirrors: [UpdateMirror.github, _m1]);
 const _api = 'https://api.github.com/repos/wuwei-123/dshbianjie/releases/latest';
 const _manifest = 'https://github.com/wuwei-123/dshbianjie/releases/latest/download/update.json';
-const _apkUrl = 'https://github.com/wuwei-123/dshbianjie/releases/download/v1.2.0/dsh-go-1.2.0-arm64.apk';
+const _apkUrl = 'https://github.com/wuwei-123/dshbianjie/releases/download/v1.2.0/dshbianjie-1.2.0-arm64.apk';
 
 final _apk = utf8.encode('PK pretend this is DSH 1.2.0 for arm64');
 
@@ -28,11 +28,11 @@ Map<String, Object?> _release({String version = '1.2.0', List<int>? apk, String?
   'notes': '- 应用内更新',
   'assets': {
     'arm64': {
-      'name': 'dsh-go-1.2.0-arm64.apk',
+      'name': 'dshbianjie-1.2.0-arm64.apk',
       'size': (apk ?? _apk).length,
       'sha256': sha ?? sha256.convert(apk ?? _apk).toString(),
     },
-    'x64': {'name': 'dsh-go-1.2.0-x64.apk', 'size': 99, 'sha256': '0' * 64},
+    'x64': {'name': 'dshbianjie-1.2.0-x64.apk', 'size': 99, 'sha256': '0' * 64},
   },
 };
 
@@ -136,7 +136,7 @@ void main() {
       final state = c.read(appUpdateProvider);
       expect(state.check, UpdateCheckPhase.available);
       expect(state.latest!.version.name, '1.2.0');
-      expect(state.asset!.name, 'dsh-go-1.2.0-arm64.apk');
+      expect(state.asset!.name, 'dshbianjie-1.2.0-arm64.apk');
       expect(http.urls, [_manifest, m1]);
 
       now = now.add(const Duration(hours: 5));
@@ -222,7 +222,7 @@ void main() {
 
       await controller.startDownload();
       expect(c.read(appUpdateProvider).task, UpdateTaskPhase.ready);
-      expect(File('${dir.path}/dsh-go-1.2.0-arm64.apk').readAsBytesSync(), _apk);
+      expect(File('${dir.path}/dshbianjie-1.2.0-arm64.apk').readAsBytesSync(), _apk);
 
       await controller.install();
       expect(c.read(appUpdateProvider).task, UpdateTaskPhase.needsPermission);

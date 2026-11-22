@@ -25,7 +25,7 @@ import '../shell/golden_harness.dart';
 import 'support.dart';
 
 const _version = '1.2.0+11011200';
-const _apk = 'dsh-go-1.2.0-arm64.apk';
+const _apk = 'dshbianjie-1.2.0-arm64.apk';
 const _patchName = 'dsh-go-1.0.0-to-1.2.0-arm64.dshdlt';
 const _mirrorOrigin = 'https://mirror.example.com';
 const _feed = '$_mirrorOrigin/update.json';

@@ -11,7 +11,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'support.dart';
 
-const _name = 'dsh-go-1.2.0-arm64.apk';
+const _name = 'dshbianjie-1.2.0-arm64.apk';
 const _manifest = 'https://github.com/wuwei-123/dshbianjie/releases/latest/download/update.json';
 const _asset = 'https://github.com/wuwei-123/dshbianjie/releases/download/v1.2.0/$_name';
 final _bytes = utf8.encode('PK fixed startup-cleanup regression payload');

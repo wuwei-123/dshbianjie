@@ -23,15 +23,15 @@ void main() {
 
     test('picks the APK for each flavor; digest becomes the checksum', () {
       final arm = release.apkFor(ApkFlavor.arm64)!;
-      expect(arm.name, 'dsh-go-1.2.0-arm64.apk');
+      expect(arm.name, 'dshbianjie-1.2.0-arm64.apk');
       expect(arm.size, 180107933);
       expect(arm.sha256, '3a8498bcf7d895bac5c9f2f02829c9ec7064cd8bc7ef9f1792f28277d44839f2');
       expect(
         arm.url.toString(),
-        'https://github.com/wuwei-123/dshbianjie/releases/download/v1.2.0/dsh-go-1.2.0-arm64.apk',
+        'https://github.com/wuwei-123/dshbianjie/releases/download/v1.2.0/dshbianjie-1.2.0-arm64.apk',
       );
       final x64 = release.apkFor(ApkFlavor.x64)!;
-      expect(x64.name, 'dsh-go-1.2.0-x64.apk');
+      expect(x64.name, 'dshbianjie-1.2.0-x64.apk');
       expect(x64.sha256, isNull, reason: 'no digest: resolved from SHA256SUMS at download time');
       expect(release.apkFor(null), isNull);
       // update.json and SHA256SUMS are not APKs.
@@ -66,7 +66,7 @@ void main() {
       final arm = release.apkFor(ApkFlavor.arm64)!;
       expect(
         arm.url.toString(),
-        'https://github.com/wuwei-123/dshbianjie/releases/download/v1.2.0/dsh-go-1.2.0-arm64.apk',
+        'https://github.com/wuwei-123/dshbianjie/releases/download/v1.2.0/dshbianjie-1.2.0-arm64.apk',
       );
       expect(arm.sha256, hasLength(64));
       expect(arm.size, 14);
@@ -84,7 +84,7 @@ void main() {
       expect(release.tag, 'v1.3.0');
       expect(release.apkFor(ApkFlavor.arm64)!.url.toString(), 'https://update.example.com/dsh/files/a.apk');
       expect(release.apkFor(ApkFlavor.arm64)!.sha256, 'a' * 64);
-      expect(release.apkFor(ApkFlavor.x64)!.name, 'dsh-go-1.3.0-x64.apk');
+      expect(release.apkFor(ApkFlavor.x64)!.name, 'dshbianjie-1.3.0-x64.apk');
       expect(release.apkFor(ApkFlavor.x64)!.url.host, 'cdn.example.com');
       expect(release.apks, hasLength(2));
     });
@@ -125,8 +125,26 @@ void main() {
   group('names and checksums', () {
     test('asset name follows the convention, without the build number', () {
       final version = AppVersion.tryParse('1.3.0-beta.2+40')!;
-      expect(apkAssetName(version, ApkFlavor.arm64), 'dsh-go-1.3.0-beta.2-arm64.apk');
-      expect(apkAssetName(version, ApkFlavor.x64), 'dsh-go-1.3.0-beta.2-x64.apk');
+      expect(apkAssetName(version, ApkFlavor.arm64), 'dshbianjie-1.3.0-beta.2-arm64.apk');
+      expect(apkAssetName(version, ApkFlavor.x64), 'dshbianjie-1.3.0-beta.2-x64.apk');
+    });
+
+    test('a release published under the old dsh-go name still parses', () {
+      // Before the rename this fork's assets were `dsh-go-<v>-<flavor>.apk`.
+      // An installed build has to read such a release to be offered the
+      // upgrade that renames them, so the old form keeps a guard.
+      final json = jsonEncode({
+        'tag_name': 'v0.0.9',
+        'name': 'DSH Go 0.0.9',
+        'published_at': '2026-11-01T00:00:00Z',
+        'assets': [
+          {'name': 'dsh-go-0.0.9-arm64.apk', 'size': 1, 'browser_download_url': 'https://github.com/wuwei-123/dshbianjie/releases/download/v0.0.9/dsh-go-0.0.9-arm64.apk'},
+          {'name': 'dsh-go-0.0.9-x64.apk', 'size': 2, 'browser_download_url': 'https://github.com/wuwei-123/dshbianjie/releases/download/v0.0.9/dsh-go-0.0.9-x64.apk'},
+        ],
+      });
+      final release = parseGithubRelease(jsonDecode(json));
+      expect(release.apkFor(ApkFlavor.arm64)!.name, 'dsh-go-0.0.9-arm64.apk');
+      expect(release.apkFor(ApkFlavor.x64)!.name, 'dsh-go-0.0.9-x64.apk');
     });
 
     test('flavor from appFlavor or the native ABI', () {
@@ -141,11 +159,11 @@ void main() {
 
     test('SHA256SUMS in text and binary mode; digest prefixes', () {
       final sums = parseSha256Sums(
-        '${'A' * 64}  dsh-go-1.2.0-arm64.apk\n'
-        '${'b' * 64} *dsh-go-1.2.0-x64.apk\r\n'
+        '${'A' * 64}  dshbianjie-1.2.0-arm64.apk\n'
+        '${'b' * 64} *dshbianjie-1.2.0-x64.apk\r\n'
         'garbage line\n',
       );
-      expect(sums, {'dsh-go-1.2.0-arm64.apk': 'a' * 64, 'dsh-go-1.2.0-x64.apk': 'b' * 64});
+      expect(sums, {'dshbianjie-1.2.0-arm64.apk': 'a' * 64, 'dshbianjie-1.2.0-x64.apk': 'b' * 64});
       expect(normalizeSha256('sha256:${'C' * 64}'), 'c' * 64);
       expect(normalizeSha256('sha1:abc'), isNull);
       expect(normalizeSha256(null), isNull);

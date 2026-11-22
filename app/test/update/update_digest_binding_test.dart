@@ -28,7 +28,7 @@ import 'support.dart';
 
 const _sources = UpdateSources(mirrors: [UpdateMirror.github]);
 const _manifest = 'https://github.com/wuwei-123/dshbianjie/releases/latest/download/update.json';
-const _name = 'dsh-go-1.2.0-arm64.apk';
+const _name = 'dshbianjie-1.2.0-arm64.apk';
 const _asset = 'https://github.com/wuwei-123/dshbianjie/releases/download/v1.2.0/$_name';
 const _sums = 'https://github.com/wuwei-123/dshbianjie/releases/download/v1.2.0/SHA256SUMS';
 

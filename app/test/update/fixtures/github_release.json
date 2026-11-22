@@ -13,7 +13,7 @@
     {
       "url": "https://api.github.com/repos/wuwei-123/dshbianjie/releases/assets/300000001",
       "id": 300000001,
-      "name": "dsh-go-1.2.0-arm64.apk",
+      "name": "dshbianjie-1.2.0-arm64.apk",
       "label": "",
       "content_type": "application/vnd.android.package-archive",
       "state": "uploaded",
@@ -22,12 +22,12 @@
       "download_count": 12,
       "created_at": "2026-11-01T07:50:00Z",
       "updated_at": "2026-11-01T07:51:00Z",
-      "browser_download_url": "https://github.com/wuwei-123/dshbianjie/releases/download/v1.2.0/dsh-go-1.2.0-arm64.apk"
+      "browser_download_url": "https://github.com/wuwei-123/dshbianjie/releases/download/v1.2.0/dshbianjie-1.2.0-arm64.apk"
     },
     {
       "url": "https://api.github.com/repos/wuwei-123/dshbianjie/releases/assets/300000002",
       "id": 300000002,
-      "name": "dsh-go-1.2.0-x64.apk",
+      "name": "dshbianjie-1.2.0-x64.apk",
       "label": "",
       "content_type": "application/vnd.android.package-archive",
       "state": "uploaded",
@@ -36,7 +36,7 @@
       "download_count": 1,
       "created_at": "2026-11-01T07:50:00Z",
       "updated_at": "2026-11-01T07:51:00Z",
-      "browser_download_url": "https://github.com/wuwei-123/dshbianjie/releases/download/v1.2.0/dsh-go-1.2.0-x64.apk"
+      "browser_download_url": "https://github.com/wuwei-123/dshbianjie/releases/download/v1.2.0/dshbianjie-1.2.0-x64.apk"
     },
     {
       "url": "https://api.github.com/repos/wuwei-123/dshbianjie/releases/assets/300000003",
