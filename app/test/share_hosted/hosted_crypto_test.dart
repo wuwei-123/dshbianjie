@@ -39,9 +39,18 @@ void main() {
       final dir = await Directory.systemTemp.createTemp('hosted-');
       addTearDown(() => dir.delete(recursive: true));
       final file = File('${dir.path}/blob')..writeAsBytesSync(sealHosted(utf8.encode(text), key));
-      final result = await Process.run('node', ['$_fixtures/open_blob.mjs', file.path, encodeHostedKey(key)]);
-      expect(result.exitCode, 0, reason: '${result.stderr}');
-      final out = jsonDecode(result.stdout as String) as Map<String, Object?>;
+      // A bare path, not a file:// URI: Dart's Process.run on Windows mangles a
+      // `file:///D:/...` argument (it arrives as `<cwd>\file:\D:\...`), and node
+      // then reads `app\file:` as the module. node resolves a plain path itself;
+      // the fixture uses import.meta.url for its own relative imports.
+      final script = File('$_fixtures/open_blob.mjs').path;
+      final result = await Process.run('node', [script, file.path, encodeHostedKey(key)], stdoutEncoding: null, stderrEncoding: null);
+      expect(
+        result.exitCode,
+        0,
+        reason: utf8.decode(result.stderr as List<int>, allowMalformed: true),
+      );
+      final out = jsonDecode(utf8.decode(result.stdout as List<int>)) as Map<String, Object?>;
       expect(out['text'], text);
       if (out['viewer'] != null) expect(out['viewer'], text);
     });
@@ -110,11 +119,11 @@ void main() {
 
     test('parses hosted links', () {
       final key = encodeHostedKey(newHostedKey());
-      final ref = parseHostedUrl('#k=$key')!;
-      expect(ref.origin, '');
+      final ref = parseHostedUrl('https://go.dshtui.com/c/Ab3dE5gH9k#k=$key')!;
+      expect(ref.origin, 'https://go.dshtui.com');
       expect(ref.id, 'Ab3dE5gH9k');
       expect(ref.key, key);
-      expect(parseHostedUrl('#k=$key')?.id, 'Ab3dE5gH9k');
+      expect(parseHostedUrl('https://go.dshtui.com/c/Ab3dE5gH9k#k=$key')?.id, 'Ab3dE5gH9k');
       expect(parseHostedUrl('#k=$key', origin: 'https://s.dshtui.com'), isNull);
       expect(parseHostedUrl(''), isNull);
       expect(parseHostedUrl('#k=$key'), isNull);

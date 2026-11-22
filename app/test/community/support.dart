@@ -29,7 +29,7 @@ String sampleFeed({int revision = 7, String tagline = '开源项目，欢迎点�
       'kind': 'qq',
       'title': 'QQ 交流群',
       'subtitle': '群号 123456789',
-      'url': '',
+      'url': 'https://qm.qq.com/q/example',
       'copy': '123456789',
     },
     {'kind': 'wechat', 'title': '微信公众号', 'subtitle': '搜索「dsh边界」', 'qr': 'https://example.com/wechat'},

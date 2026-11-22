@@ -212,7 +212,7 @@ void main() {
       expect(ShareLink.parse(Uri.parse('dshgo://forum/auth?p=a.b')), isNull);
       expect(ShareLink.parse(Uri.parse('https://evil.example/dsh-go/share/#p=a.b')), isNull);
       expect(ShareLink.parse(Uri.parse('dshgo://share/plugin')), isNull);
-      expect(isLandingUri(Uri.parse('')), isFalse);
+      expect(isLandingUri(Uri.parse('https://ccch1mneyyy.github.io/dsh-go/sharer/')), isFalse);
     });
 
     test('finds the link in a pasted message', () {

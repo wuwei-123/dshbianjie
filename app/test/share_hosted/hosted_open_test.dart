@@ -34,7 +34,7 @@ void main() {
   group('landing page', () {
     test('lives on the share host; old github.io links still read', () {
       expect(shareLandingUrl, '$shareHostOrigin/share/');
-      expect(shareLandingUrl, '');
+      expect(shareLandingUrl, 'https://go.dshtui.com/share/');
       const code = 'abc123.ABCDEFGH';
       for (final base in [shareLandingUrl, ...legacyShareLandingUrls]) {
         final uri = Uri.parse('$base#p=$code');
@@ -42,11 +42,11 @@ void main() {
         expect(ShareLink.parse(uri)?.code, code, reason: base);
         expect(ShareLink.find('看看这个 $base#p=$code 很好用')?.code, code, reason: base);
       }
-      expect(isLandingUri(Uri.parse('')), isFalse);
-      expect(isLandingUri(Uri.parse('')), isFalse);
+      expect(isLandingUri(Uri.parse('https://ccch1mneyyy.github.io/dsh-go/other/')), isFalse);
+      expect(isLandingUri(Uri.parse('https://go.dshtui.com/c/')), isFalse);
       expect(
         ShareLink.inline(ShareLink.parse(Uri.parse('dshgo://share/plugin?p=$code'))!.kind!, code).webLink,
-        startsWith('#p='),
+        startsWith('https://go.dshtui.com/share/#p='),
       );
     });
   });
@@ -55,25 +55,25 @@ void main() {
     final key = encodeHostedKey(newHostedKey());
 
     test('https and dshgo forms, on our host only', () {
-      expect(parseHostedUrl('dshgo://go.dshtui.com/c/Ab3dE5gH9k#k=$key')?.origin, '');
-      expect(isHostedLink(Uri.parse('#k=$key')), isTrue);
+      expect(parseHostedUrl('dshgo://go.dshtui.com/c/Ab3dE5gH9k#k=$key')?.origin, 'https://go.dshtui.com');
+      expect(isHostedLink(Uri.parse('https://go.dshtui.com/c/Ab3dE5gH9k#k=$key')), isTrue);
       expect(isHostedLink(Uri.parse('dshgo://go.dshtui.com/c/Ab3dE5gH9k#k=$key')), isTrue);
       expect(isHostedLink(Uri.parse('https://evil.example/c/Ab3dE5gH9k#k=$key')), isFalse);
-      expect(isHostedLink(Uri.parse(':8443/c/Ab3dE5gH9k#k=$key')), isFalse);
+      expect(isHostedLink(Uri.parse('https://go.dshtui.com:8443/c/Ab3dE5gH9k#k=$key')), isFalse);
     });
 
     test('in forwarded text, punctuation and all', () {
-      final url = '#k=$key';
+      final url = 'https://go.dshtui.com/c/Ab3dE5gH9k#k=$key';
       expect(findHostedUrl('「修复登录」· dsh边界 对话\n$url'), Uri.parse(url));
       expect(findHostedUrl('看这个：$url。'), Uri.parse(url));
       expect(findHostedUrl('dshgo://go.dshtui.com/c/Ab3dE5gH9k#k=$key'), Uri.parse(url));
       expect(findHostedUrl('https://evil.example/c/Ab3dE5gH9k#k=$key'), isNull);
-      expect(findHostedUrl('#k=short'), isNull);
-      expect(findHostedUrl('#p=a.b'), isNull);
+      expect(findHostedUrl('https://go.dshtui.com/c/Ab3dE5gH9k#k=short'), isNull);
+      expect(findHostedUrl('https://go.dshtui.com/share/#p=a.b'), isNull);
     });
 
     test('a shared text with one goes to its replay, not the composer', () {
-      final url = '#k=$key';
+      final url = 'https://go.dshtui.com/c/Ab3dE5gH9k#k=$key';
       expect(IncomingShare(text: '「修复登录」· dsh边界 对话\n$url').hostedLink, Uri.parse(url));
       expect(
         IncomingShare(
@@ -122,18 +122,18 @@ void main() {
         await pumpFrames(tester, 6);
         expect(find.byType(ReplayPage), findsOneWidget);
         expect(find.text('修复登录重复提交'), findsWidgets);
-        expect(host.requests.single.url.toString(), '');
+        expect(host.requests.single.url.toString(), 'https://go.dshtui.com/api/v1/c/M000000001');
       });
     }
 
     testWidgets('a deleted link or a wrong key says so', (tester) async {
       final links = await pumpHome(tester);
-      links.add(Uri.parse('#k=$key'));
+      links.add(Uri.parse('https://go.dshtui.com/c/M000000002#k=$key'));
       await pumpFrames(tester, 4);
       expect(find.text('链接已过期或被删除'), findsOneWidget);
       expect(find.byType(ReplayPage), findsNothing);
       await tester.pump(const Duration(seconds: 5));
-      links.add(Uri.parse('#k=${encodeHostedKey(newHostedKey())}'));
+      links.add(Uri.parse('https://go.dshtui.com/c/M000000001#k=${encodeHostedKey(newHostedKey())}'));
       await pumpFrames(tester, 4);
       expect(find.text('链接不完整或已损坏'), findsOneWidget);
       expect(find.byType(ReplayPage), findsNothing);

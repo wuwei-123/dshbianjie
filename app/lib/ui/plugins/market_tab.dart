@@ -278,7 +278,11 @@ class _SectionNote extends StatelessWidget {
 }
 
 /// The market repository's submission guide (GitHub), at the bottom.
-const marketSubmitUrl = 'https://github.com/ccch1mneyyy/dsh-go-market#提交插件';
+///
+/// Points at this build's own market repository. Upstream it named the project
+/// its plugin index came from; keeping that link would send people to a market
+/// this app does not publish to.
+const marketSubmitUrl = 'https://github.com/wuwei-123/dshbianjie#提交插件';
 
 class _SubmitPlugin extends StatelessWidget {
   const _SubmitPlugin();

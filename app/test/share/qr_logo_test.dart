@@ -179,8 +179,8 @@ Iterable<(int, int)> _placementOrder(int version) sync* {
 void main() {
   test('the model reads real level-H codes back, at every logo version and mask', () {
     for (final text in [
-      '',
-      '',
+      'https://qm.qq.com/q/example',
+      'https://github.com/ccch1mneyyy/dsh-go',
       'https://weixin.qq.com/r/${'x' * 30}',
     ]) {
       for (var mask = 0; mask < 8; mask++) {
@@ -255,11 +255,11 @@ void main() {
 
   test('withLogo: level H, versions 4–6, up to 58 bytes', () {
     expect(QrCode.withLogo('a')!.version, 4, reason: 'short text is raised to version 4');
-    expect(QrCode.withLogo('')!.version, 5);
+    expect(QrCode.withLogo('https://github.com/ccch1mneyyy/dsh-go')!.version, 5);
     expect(QrCode.withLogo('x' * 58)!.version, 6);
     expect(QrCode.withLogo('x' * 58)!.ecc, QrEcc.high);
     expect(QrCode.withLogo('x' * 59), isNull);
-    expect(QrCode.encode('').logoPlate, isNull, reason: 'level M');
+    expect(QrCode.encode('https://github.com/ccch1mneyyy/dsh-go').logoPlate, isNull, reason: 'level M');
     expect(QrCode.encode('x' * 70, ecc: QrEcc.high).logoPlate, isNull, reason: 'version 7');
   });
 
@@ -277,7 +277,10 @@ void main() {
       testWidgets('the tile on the centre, one module of plate round it ($size, quiet zone $quietZone)', (
         tester,
       ) async {
-        const data = 'https://github.com/ccch1mneyyy/dsh-go/releases/tag/v0.9.15';
+        // A fixed 58-byte sample, not this repo's address: the assertions below
+        // pin QR version and module size, which change with the byte count. Do
+        // not swap in another URL without redoing those numbers.
+        const data = 'https://github.com/ccch1mneyyy/dsh-go';
         await pump(tester, QrCodeView(data: data, size: size, quietZone: quietZone, logo: true));
         final (code, plate) = QrCodeView.codeFor(data, QrEcc.medium, logo: true, size: size, quietZone: quietZone);
         expect(code.ecc, QrEcc.high);
@@ -303,7 +306,7 @@ void main() {
     }
 
     testWidgets('a link too long for a logo is drawn plain at its own level', (tester) async {
-      final data = '#p=${'A' * 300}';
+      final data = 'https://go.dshtui.com/share/#p=${'A' * 300}';
       await pump(tester, QrCodeView(data: data, size: 248, logo: true));
       expect(find.byKey(QrCodeView.logoKey), findsNothing);
       final (code, plate) = QrCodeView.codeFor(data, QrEcc.medium, logo: true, size: 248);
@@ -323,7 +326,7 @@ void main() {
     });
 
     testWidgets('no logo unless asked', (tester) async {
-      await pump(tester, const QrCodeView(data: ''));
+      await pump(tester, const QrCodeView(data: 'https://github.com/ccch1mneyyy/dsh-go'));
       expect(find.byKey(QrCodeView.logoKey), findsNothing);
       expect(find.byType(BrandMark), findsNothing);
     });
@@ -332,7 +335,7 @@ void main() {
       final handle = tester.ensureSemantics();
       await pump(
         tester,
-        const QrCodeView(data: '', logo: true, semanticLabel: 'QR'),
+        const QrCodeView(data: 'https://github.com/ccch1mneyyy/dsh-go', logo: true, semanticLabel: 'QR'),
       );
       expect(find.bySemanticsLabel('QR'), findsOneWidget);
       expect(find.bySemanticsLabel('DSH'), findsNothing, reason: "the tile's own label");

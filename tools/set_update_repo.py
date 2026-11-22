@@ -39,6 +39,11 @@ TEST_DIRS = [ROOT / "app" / "test"]
 CURRENT = "ccch1mneyyy/dsh-go"
 CURRENT_MARKET = "ccch1mneyyy/dsh-go-market"
 
+# Files that mention the repo as a *sized fixture*, not as a URL to follow:
+# test/share/qr_logo_test.dart pins QR version and module size to a 58-byte
+# string, so a longer slug silently changes what it asserts. Leave it alone.
+SKIP = {"app/test/share/qr_logo_test.dart"}
+
 
 def slug_ok(slug: str) -> bool:
     return re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9-]*/[A-Za-z0-9._-]+", slug) is not None
@@ -75,6 +80,21 @@ def main() -> int:
     # 2) test literals that spell the release URLs out
     for root in TEST_DIRS:
         for path in sorted(root.rglob("*.dart")):
+            if path.relative_to(ROOT).as_posix() in SKIP:
+                continue
+            old = path.read_text(encoding="utf-8")
+            if CURRENT not in old:
+                continue
+            done = old.replace(CURRENT, slug)
+            if done != old:
+                edits.append((path, old.count(CURRENT)))
+                if not args.dry_run:
+                    path.write_text(done, encoding="utf-8")
+
+    # 3) fixtures: release_test parses a recorded GitHub API answer, so the
+    #    URLs inside it must name the same repo the encoder builds.
+    for root in TEST_DIRS:
+        for path in sorted(root.rglob("*.json")):
             old = path.read_text(encoding="utf-8")
             if CURRENT not in old:
                 continue

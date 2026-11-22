@@ -1,0 +1,13 @@
+# Line endings are part of the artifact here: app/tool/make_replay_viewer.py
+# hashes site/share/viewer.{js,css,html} and the app's replay_viewer.g.dart
+# pins that hash, so a checkout that rewrites line endings makes the byte-for-byte
+# comparison in test/share_code/replay_viewer_sync_test.dart fail. Keep these
+# files exactly as committed on every platform.
+site/share/* text eol=lf
+
+# The rest: let each platform keep its own convention, but never convert the
+# generated/binary artifacts.
+*.png binary
+*.jpg binary
+*.jks binary
+*.keystore binary

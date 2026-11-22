@@ -1129,6 +1129,7 @@ final _rows = <SettingSpot>[
   Spots.version,
   Spots.updateCheck,
   Spots.updateAuto,
-  Spots.star,
-  Spots.licenses,
+  // Spots.star and Spots.licenses are not listed: 关于 draws neither row in
+  // this build, and a listed spot would let the search return a result that
+  // opens nothing. Their definitions stay (about_page.dart's comment).
 ];

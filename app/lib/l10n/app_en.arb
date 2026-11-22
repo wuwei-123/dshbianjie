@@ -2564,7 +2564,7 @@
   "hubTableTintFollowHint": "Header tint only, body follows the reply",
   "hubTableTintNoneHint": "Grid lines only, the lightest",
   "hubAbout": "About dsh边界",
-  "hubAboutAuthor": "Original author of dsh边界",
+  "hubAboutAuthor": "Maintainer of dsh边界",
   "hubAboutBilibili": "Bilibili profile",
   "hubAboutX": "X profile",
   "hubAboutGithub": "GitHub profile",

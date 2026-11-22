@@ -348,7 +348,7 @@ void main() {
     now = DateTime(2026, 10, 29, 9);
     await c.comeBack();
 
-    expect(http.urls.single, Uri.parse(''));
+    expect(http.urls.single, Uri.parse('https://go.dshtui.com/api/usage/v1'));
     final body = http.requests.single;
     expect(body.keys.toSet(), usagePayloadKeys);
     final counts = body['counts']! as Map<String, Object?>;

@@ -15479,7 +15479,7 @@ abstract class L10n {
   /// No description provided for @hubAboutAuthor.
   ///
   /// In zh, this message translates to:
-  /// **'dsh边界 原作者'**
+  /// **'dsh边界 维护者'**
   String get hubAboutAuthor;
 
   /// No description provided for @hubAboutBilibili.

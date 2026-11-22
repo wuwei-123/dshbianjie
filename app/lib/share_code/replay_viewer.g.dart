@@ -11,7 +11,7 @@ const replayViewerPage = r'''<!doctype html>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="referrer" content="no-referrer">
 <meta name="robots" content="noindex">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-SQx9DjHcIv7KDXzxussj4x+ZyUAaCegGkYXT1lOZc8A='; style-src 'unsafe-inline'; img-src data: blob:; connect-src 'none'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-1pZMVKHJCbt4dh3xTqpxxuTBFq1ntqHKwjJ2Rnfr1Ik='; style-src 'unsafe-inline'; img-src data: blob:; connect-src 'none'; base-uri 'none'; form-action 'none'">
 <meta name="color-scheme" content="light dark">
 <title>__DSHGO_TITLE__</title>
 <style>/* dsh边界 conversation viewer (viewer.js). Shared by the landing page and the
@@ -1891,4 +1891,4 @@ DshgoViewer.boot();
 ''';
 
 /// What the page was built from (test/share_code/replay_viewer_sync_test.dart).
-const replayViewerSourceHash = '676f55f8a99ddb882587d2a928116e5ee77900c9c399b08085815875c23b881b';
+const replayViewerSourceHash = '95e7da53b80a3fecf230ff9ca84d0a7332f2d4b6af2faf0a0f1d40716b9b49e0';

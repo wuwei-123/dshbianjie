@@ -8866,7 +8866,7 @@ class L10nEn extends L10n {
   String get hubAbout => 'About dsh边界';
 
   @override
-  String get hubAboutAuthor => 'Original author of dsh边界';
+  String get hubAboutAuthor => 'Maintainer of dsh边界';
 
   @override
   String get hubAboutBilibili => 'Bilibili profile';

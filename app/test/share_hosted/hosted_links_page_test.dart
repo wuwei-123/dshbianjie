@@ -20,8 +20,10 @@ final _now = DateTime(2026, 10, 25, 12);
 
 HostedLink _link(String id, String title, {DateTime? expires, HostedTtl ttl = HostedTtl.month}) => HostedLink(
   id: id,
-  // Fixed keys: the goldens don't show them, but keep runs identical.
-  key: encodeHostedKey(List.generate(32, (i) => (i * 7 + id.codeUnitAt(0)) & 0xff)),
+  // Deterministic but distinct per link: the page drops a duplicate key, and
+  // seeding from id.codeUnitAt(0) alone made A000000002 and A000000004 share
+  // one key, so the older link vanished from the list.
+  key: encodeHostedKey(List.generate(32, (i) => (i * 7 + id.codeUnitAt(0) + id.codeUnitAt(9) * 3) & 0xff)),
   deleteToken: 'token-$id-0123456789',
   title: title,
   createdAt: DateTime(2026, 10, 20),
@@ -55,6 +57,11 @@ Future<(FakeHost, MemoryStore)> _pump(
       brightness: brightness,
       overrides: [
         hostedLinkStoreProvider.overrideWithValue(store),
+        // Pinned: the controller drops links that expired more than
+        // keepExpired ago and erases them from the store, so seeding dates
+        // against a fixed _now needs the same clock or the result depends on
+        // the day the suite runs.
+        hostedLinksClockProvider.overrideWithValue(() => _now),
         hostedShareClientProvider.overrideWithValue(
           HostedShareClient(client: host.client, origin: 'https://go.example'),
         ),

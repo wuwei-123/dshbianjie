@@ -43,6 +43,14 @@ class SecureHostedLinkStore implements HostedLinkStore {
 
 final hostedLinkStoreProvider = Provider<HostedLinkStore>((ref) => const SecureHostedLinkStore());
 
+/// The clock the retention cutoff reads.
+///
+/// Separate from [hostedLinksProvider] so tests can pin it: the cutoff decides
+/// which expired links are dropped (and then erased from the store), so a test
+/// that seeded a date relative to a fixed `now` would otherwise pass or fail
+/// depending on the day it ran.
+final hostedLinksClockProvider = Provider<DateTime Function()>((ref) => DateTime.now);
+
 final hostedShareClientProvider = Provider<HostedShareClient>((ref) {
   final client = HostedShareClient();
   ref.onDispose(client.close);
@@ -111,7 +119,7 @@ class HostedLinksController extends Notifier<HostedLinksState> {
     }
     if (!ref.mounted) return;
     _canSave = true;
-    final cutoff = DateTime.now().subtract(keepExpired);
+    final cutoff = ref.read(hostedLinksClockProvider)().subtract(keepExpired);
     final links = [
       for (final l in saved)
         if (l.expiresAt == null || l.expiresAt!.isAfter(cutoff)) l,

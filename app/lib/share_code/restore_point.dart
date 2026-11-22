@@ -94,7 +94,12 @@ class RestorePoint {
       final parent = fs.dir('$backup/skills');
       parent.createSync(recursive: true);
       final slot = fs.dir('$backup/skills/${skill.name}');
-      if (parent.listSync(followLinks: false).any((entry) => entry.path == slot.path)) {
+      // Normalised: `listSync` reports the host's separator (on Windows
+      // `...\skills\outline`), while `slot.path` is written with `/`, so raw
+      // equality would miss an existing backup and overwrite it.
+      bool same(String a, String b) =>
+          a.replaceAll('\\', '/') == b.replaceAll('\\', '/');
+      if (parent.listSync(followLinks: false).any((entry) => same(entry.path, slot.path))) {
         throw const FileSystemException('skill backup already exists');
       }
       slot.createSync();

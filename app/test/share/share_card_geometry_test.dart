@@ -6,6 +6,7 @@
 // with equal room either side of their text; the galleries' even gaps and
 // edges on the column; and the card unchanged by the phone's text size.
 
+import 'package:dshbianjie_app/l10n/l10n.dart';
 import 'package:dshbianjie_app/ui/share/qr_code.dart';
 import 'package:dshbianjie_app/ui/share/share_card.dart';
 import 'package:dshbianjie_app/ui/share/share_content.dart';
@@ -91,7 +92,7 @@ void main() {
   }
 
   test('at 72 the card takes the logo at every logo version: links up to 58 bytes', () {
-    for (final (link, version) in [('', 4), (dshbianjieProjectUrl, 5), ('x' * 58, 6)]) {
+    for (final (link, version) in [('https://qm.qq.com/q/example', 4), (dshbianjieProjectUrl, 5), ('x' * 58, 6)]) {
       final (code, plate) = QrCodeView.codeFor(link, QrEcc.medium, logo: true, size: ShareCard.qrSize, quietZone: 3);
       expect((code.version, code.ecc, plate?.side), (version, QrEcc.high, QrCode.logoPlates[version]));
       expect(ShareCard.qrSize / (code.size + 6), greaterThanOrEqualTo(QrCodeView.logoMinModule));
@@ -99,7 +100,7 @@ void main() {
   });
 
   test('a card draws a code up to version 6, and none past it', () {
-    String link(int bytes) => '#p=${'A' * (bytes - 31)}';
+    String link(int bytes) => 'https://go.dshtui.com/share/#p=${'A' * (bytes - 31)}';
     // Version 6 is the finest that read in every halved export; 7 is under the line.
     expect(ShareCard.qrSize / (4 * 6 + 17 + 6), greaterThanOrEqualTo(ShareCard.qrMinModule));
     expect(ShareCard.qrSize / (4 * 7 + 17 + 6), lessThan(ShareCard.qrMinModule));
@@ -129,7 +130,18 @@ void main() {
       );
       expect(find.byKey(const ValueKey('share-qr')), findsNothing);
       expect(find.byType(QrCodeView), findsNothing);
-      expect(find.text('手机上的 DSH'), findsOneWidget);
+      // From the shipped strings, not a copy: this build renamed the brand, and
+      // a hard-coded headline silently stops testing the row it looks for.
+      // The brand block draws the wordmark (AppInfo.name) and, under it, this
+      // build's brand line - the same word twice on a card with no code, so the
+      // assertion is that the line is present rather than unique.
+      expect(
+        find.descendant(
+          of: find.byKey(const ValueKey('share-brand')),
+          matching: find.text(lookupL10n(AppLocale.zhCN).viewShareBrandLineNoQr),
+        ),
+        findsWidgets,
+      );
       expect(find.textContaining('扫码'), findsNothing);
       final card = tester.getRect(find.byType(ShareCard));
       final brand = _rect(tester, 'share-brand');

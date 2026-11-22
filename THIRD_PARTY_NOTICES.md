@@ -7,6 +7,21 @@
 - 许可证全文见文末「许可证全文」。
 - 本项目自己的许可见 `LICENSE`（AGPL-3.0）；品牌标识和吉祥物美术不属于第三方，也不在 AGPL 授权范围内，见 `ASSETS.md`。
 
+## 零、本项目的来源
+
+dsh边界 是 [dsh-go](https://github.com/ccch1mneyyy/dsh-go)（作者
+[ccch1mneyyy](https://github.com/ccch1mneyyy)）的二开版本：界面、Flutter 应用、
+Android 工程、运行时打包与发版流程都从该项目复制并修改而来。上游 `LICENSE` 为
+AGPL-3.0，本项目沿用同一许可，完整条文见仓库根的 `LICENSE`。
+
+再分发时请保留本节。上游作者不对本项目背书，本项目的问题请提到
+本仓库的 issue，不要去找上游。
+
+```text
+Derived from dsh-go (https://github.com/ccch1mneyyy/dsh-go),
+Copyright (c) 2026 ccch1mneyyy, under the GNU Affero General Public
+License v3.0. Modified for dsh边界. Not endorsed by the original author.
+```
 ## 一、复制或改写进源码的代码
 
 ### Phase（经作者许可使用）

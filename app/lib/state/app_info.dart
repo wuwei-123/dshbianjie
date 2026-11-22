@@ -29,13 +29,19 @@ abstract final class AppInfo {
   /// The line under the brand mark (welcome page, 关于 dsh边界).
   static String get slogan => appL10n.appSlogan;
 
-  /// The original dsh边界 author and their personal profiles, not project pages.
-  static const author = 'ccch1mneyyy';
-  static const authorBilibiliName = 'ccchimneyyy';
-  static const authorBilibiliUrl = 'https://b23.tv/9WBns6Y';
-  static const authorXHandle = '@cccch1mneyyyy';
-  static const authorXUrl = 'https://x.com/cccch1mneyyyy';
-  static const authorGithubUrl = 'https://github.com/ccch1mneyyy';
+  /// Who maintains this build, and their personal profiles.
+  ///
+  /// This is the fork's maintainer, not the dsh-go project's original author:
+  /// `ccch1mneyyy` built dsh-go, which this app derives from, and is credited
+  /// as such in THIRD_PARTY_NOTICES.md. Listing them here as "the author"
+  /// would both misattribute this build and imply an endorsement it does not
+  /// have. They have no Bilibili or X profile here for the same reason.
+  static const author = 'wuwei-123';
+  static const authorBilibiliName = '';
+  static const authorBilibiliUrl = '';
+  static const authorXHandle = '';
+  static const authorXUrl = '';
+  static const authorGithubUrl = 'https://github.com/wuwei-123';
 
   static const deepseekPlatform = 'https://platform.deepseek.com/api_keys';
   static const remoteConsole = 'https://dsh.r2049.cn/app';

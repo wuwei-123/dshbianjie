@@ -18,7 +18,7 @@ import 'usage_ledger.dart';
 const _endpointOverride = String.fromEnvironment('DSH_USAGE_ENDPOINT');
 
 /// The share host's endpoint (services/share-worker), contracts v1 and v2.
-final defaultUsageEndpoint = Uri.parse('');
+final defaultUsageEndpoint = Uri.parse('https://go.dshtui.com/api/usage/v1');
 
 /// [defaultUsageEndpoint], or the build's override when it is usable.
 Uri get usageEndpoint => usageEndpointFrom(_endpointOverride) ?? defaultUsageEndpoint;
@@ -49,11 +49,14 @@ class IoUsageHttp implements UsageHttp {
 
   @override
   Future<int> post(Uri url, String json, {Duration timeout = const Duration(seconds: 10)}) async {
-    // A client per send: no connection, cookie or credential outlives it.
+    // An HTTP header value is ASCII (RFC 7230); `dsh边界` made Windows'
+    // HttpClient reject the request outright with FormatException, so every
+    // report failed there while it happened to work on Android. The user-facing
+    // name stays in the JSON body, where UTF-8 is allowed.
     final client = HttpClient()
       ..connectionTimeout = timeout
       ..idleTimeout = const Duration(seconds: 1)
-      ..userAgent = 'dsh边界';
+      ..userAgent = 'dshbianjie/${AppInfo.version}';
     try {
       return await () async {
         final request = await client.postUrl(url);

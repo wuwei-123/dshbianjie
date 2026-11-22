@@ -129,14 +129,32 @@ class GuestFs {
 
   static bool _validName(String name) => RegExp(r'^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$').hasMatch(name);
 
+  /// A path with one separator and no trailing slash, for comparing a path this
+  /// class built against one the filesystem reported. Windows answers with `\`
+  /// while these paths are written with `/`, so the two forms must be folded
+  /// together before equality means anything. Case is left alone: the guest
+  /// root is a case-sensitive-ish tree and folding it could merge two skills.
+  static String _normalizePath(String path) {
+    var out = path.replaceAll('\\', '/');
+    while (out.length > 1 && out.endsWith('/')) {
+      out = out.substring(0, out.length - 1);
+    }
+    return out;
+  }
+
   /// Text files of a skill folder (≤ 12, ≤ 64 KB each, three levels deep);
   /// null when it holds something that can't travel (binaries, too large).
   static Map<String, String>? _readFolder(Directory folder) {
     final files = <String, String>{};
-    final prefix = folder.path.endsWith('/') ? folder.path : '${folder.path}/';
+    // Folded to `/` first: on Windows `folder.path` ends with `/` here while
+    // `entity.path` uses `\`, so the two never share a prefix and cutting by
+    // length produced a mangled key that `isSafePath` rejected - which silently
+    // dropped every folder-shaped skill from the export.
+    final prefix = '${_normalizePath(folder.path)}/';
     for (final entity in folder.listSync(recursive: true, followLinks: false)) {
       if (entity is! File) continue;
-      final rel = entity.path.substring(prefix.length);
+      final full = _normalizePath(entity.path);
+      final rel = full.startsWith(prefix) ? full.substring(prefix.length) : full.split('/').last;
       if (!SharedSkill.isSafePath(rel)) {
         if (rel.split('/').any((s) => s.startsWith('.'))) continue;
         return null;
@@ -187,16 +205,32 @@ class GuestFs {
   Map<String, List<int>>? readSkillForImport(String name) {
     if (!_validName(name)) throw const FormatException('invalid skill name');
     final root = dir(skillsRoot);
+    // Absent (null) is distinct from unreadable (throw). Only an actually
+    // missing directory means "nothing here yet": a *file* at the skills root
+    // is a real problem the caller has to surface, so the type is checked
+    // rather than folding every failed lookup into "absent".
+    if (FileSystemEntity.typeSync(root.path, followLinks: false) == FileSystemEntityType.notFound) {
+      return null;
+    }
     final List<FileSystemEntity> entries;
     try {
       entries = root.listSync(followLinks: false);
     } on FileSystemException catch (error) {
-      if (error.osError?.errorCode == 2) return null; // Missing skills root.
+      // Dart reports a missing path as errno 2 (ENOENT, POSIX) or, on Windows,
+      // as PathNotFoundException with errno 3 (ERROR_PATH_NOT_FOUND).
+      if (error is PathNotFoundException) return null;
+      if (error.osError?.errorCode == 2 || error.osError?.errorCode == 3) return null;
       rethrow;
     }
     final folderPath = '${root.path}/$name';
     final flatPath = '${root.path}/$name.md';
-    final matches = entries.where((entry) => entry.path == folderPath || entry.path == flatPath).toList();
+    // Compared after normalising separators: `listSync` answers with the host's
+    // own separator, so on Windows an entry is `...\skills\outline` while the
+    // paths built here are `.../skills/outline`. Raw string equality therefore
+    // never matched there and every existing skill looked new (an `add`, which
+    // would have overwritten it without a backup).
+    bool same(String a, String b) => _normalizePath(a) == _normalizePath(b);
+    final matches = entries.where((entry) => same(entry.path, folderPath) || same(entry.path, flatPath)).toList();
     if (matches.isEmpty) return null;
     if (matches.length != 1) throw const FormatException('ambiguous skill files');
     final files = <String, List<int>>{};
@@ -222,7 +256,12 @@ class GuestFs {
     void walk(Directory directory, String prefix) {
       for (final entry in directory.listSync(followLinks: false)) {
         if (++entriesRead > SharedSkill.maxFiles * 4) throw const FormatException('too many skill entries');
-        final relative = '$prefix${entry.path.substring(directory.path.length + 1)}';
+        // Separator-agnostic: `directory.path` and `entry.path` may disagree on
+        // `/` vs `\` (Windows), and cutting by length alone would then keep a
+        // stray separator in the key. Fold both to `/`, then take the tail.
+        final base = _normalizePath(directory.path);
+        final full = _normalizePath(entry.path);
+        final relative = '$prefix${full.startsWith('$base/') ? full.substring(base.length + 1) : full.split('/').last}';
         if (!SharedSkill.isSafePath(relative)) throw const FormatException('unsupported skill entry');
         if (entry is File) {
           read(entry, relative);
@@ -238,10 +277,10 @@ class GuestFs {
 
     final entry = matches.single;
     if (entry is Directory &&
-        entry.path == folderPath &&
+        same(entry.path, folderPath) &&
         FileSystemEntity.typeSync(entry.path, followLinks: false) == FileSystemEntityType.directory) {
       walk(entry, '');
-    } else if (entry is File && entry.path == flatPath) {
+    } else if (entry is File && same(entry.path, flatPath)) {
       read(entry, 'SKILL.md');
     } else {
       throw const FormatException('unsupported skill entry');

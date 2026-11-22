@@ -27,11 +27,11 @@ import 'package:dshbianjie_app/state/star_prompt.dart';
 import 'package:dshbianjie_app/state/voice_state.dart';
 import 'package:dshbianjie_app/ui/common/side_insets.dart';
 import 'package:dshbianjie_app/ui/settings/about_page.dart';
-import 'package:dshbianjie_app/ui/settings/settings_widgets.dart';
 import 'package:dshbianjie_app/ui/shell/root_gate.dart';
 import 'package:dshbianjie_app/ui/star/star_prompt_dialog.dart';
 import 'package:dshbianjie_app/ui/star/star_prompt_host.dart';
 import 'package:dshbianjie_app/ui/theme/theme.dart';
+import 'package:dshbianjie_app/update/update_config.dart' show updateRepo;
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
@@ -105,7 +105,10 @@ const _halfHour = Duration(minutes: 30);
 /// Half an hour in: due.
 const _due = StarPromptRecord(used: _halfHour);
 
-final _github = Uri.parse('');
+// The prompt's target is derived from updateRepo (star_prompt.dart), so the
+// expectation is too: a copied slug would go stale the next time the release
+// repository is renamed, which is exactly what happened once already.
+final _github = Uri.https('github.com', '/$updateRepo');
 
 String _title(int hours) => lookupL10n(AppLocale.zhCN).starPromptTitle(hours);
 
@@ -693,7 +696,7 @@ void main() {
   });
 
   group('设置 › 关于 dsh边界', () {
-    testWidgets('给 dsh边界 点个 star opens GitHub and ends the prompt', (tester) async {
+    testWidgets('关于 carries no star row: the prompt never opens from there', (tester) async {
       usePhoneSurface(tester);
       final bench = _Bench(tester, MemoryStarStore(_due), TestClock());
       await tester.pumpWidget(
@@ -711,15 +714,14 @@ void main() {
         ),
       );
       await tester.pumpAndSettle();
-      final row = find.widgetWithText(SettingsTile, '给 dsh边界 点个 star');
-      await tester.scrollUntilVisible(row, 300, scrollable: find.byType(Scrollable).first);
-      await tester.pumpAndSettle();
-      await tester.tap(row);
-      await tester.pumpAndSettle();
-      expect(bench.opened, [_github]);
+
+      // This build removed the row on purpose (app/lib/ui/settings/about_page.dart),
+      // so asserting its absence is the regression guard: if the row comes back,
+      // the star prompt becomes reachable from 关于 again and this fails.
+      expect(find.byKey(const ValueKey('settings-star')), findsNothing);
+      expect(bench.opened, isEmpty);
       final container = ProviderScope.containerOf(tester.element(find.byType(AboutPage)));
-      expect(container.read(starPromptProvider).finished, isTrue);
-      expect(bench.store.record!.finished, isTrue);
+      expect(container.read(starPromptProvider).finished, isFalse);
     });
   });
 

@@ -187,6 +187,6 @@ void main() {
     expect(back.ttl, HostedTtl.month);
     expect(HostedLink.fromJson({'id': 'bad'}), isNull);
     expect(HostedLink.fromJson({...link.toJson(), 'k': 'short'}), isNull);
-    expect(HostedLink.fromJson({...link.toJson(), 'origin': 'http://evil'})!.origin, '');
+    expect(HostedLink.fromJson({...link.toJson(), 'origin': 'http://evil'})!.origin, 'https://go.dshtui.com');
   });
 }

@@ -8407,7 +8407,7 @@ class L10nZh extends L10n {
   String get hubAbout => '关于 dsh边界';
 
   @override
-  String get hubAboutAuthor => 'dsh边界 原作者';
+  String get hubAboutAuthor => 'dsh边界 维护者';
 
   @override
   String get hubAboutBilibili => 'B站主页';
