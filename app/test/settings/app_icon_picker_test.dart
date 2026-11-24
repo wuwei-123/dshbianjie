@@ -284,8 +284,10 @@ void main() {
         final frame = await (await ui.instantiateImageCodec(bytes)).getNextFrame();
         return (await frame.image.toByteData())!;
       });
-      // Inside the body (108 grid (53.5, 70)), at 4 px per unit.
-      final at = (280 * 432 + 214) * 4;
+      // Inside the mark's stroke (108 grid (53.5, 53)), at 4 px per unit.
+      // The infinity crosses itself at the centre, so x=53.5 is solid from
+      // y 48 to 58; the old point (53.5, 70) was on the whale's body.
+      final at = (212 * 432 + 214) * 4;
       final pixel = [for (var i = 0; i < 4; i++) rgba!.getUint8(at + i)];
       final mono = AppIconArt.of(AppIcon.ink).mono!;
       expect(pixel[3], 255);

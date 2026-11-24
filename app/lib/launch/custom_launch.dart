@@ -6,6 +6,8 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:ui';
 
+import 'package:flutter/services.dart' show rootBundle;
+import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 /// What the file is.
@@ -164,6 +166,56 @@ class CustomLaunch {
       bytes: raw['bytes'] is int ? raw['bytes'] as int : null,
       durationMs: raw['durationMs'] is int ? raw['durationMs'] as int : null,
     );
+  }
+
+  /// The bundled launch poster, used until the person picks their own.
+  ///
+  /// This build ships the brand poster (`assets/launch/launch_poster*.jpg`) and
+  /// wants it on a reopen, not between the system splash and the first frame of
+  /// a cold start. Installing it as the stored custom screen is what puts it
+  /// there: `LaunchController` only plays a custom picture, and only a warm
+  /// start reaches the app without the engine waiting.
+  static const defaultAsset = 'assets/launch/launch_poster_small.jpg';
+
+  /// Mirrors [defaultAsset] into the launch directory and returns it. Null when
+  /// the asset can't be read or the copy fails; the default motion then plays.
+  static Future<CustomLaunch?> installDefault() async {
+    try {
+      final base = await getApplicationSupportDirectory();
+      final dir = Directory('${base.path}/launch');
+      await dir.create(recursive: true);
+      final target = File('${dir.path}/default-poster.jpg');
+      if (!target.existsSync()) {
+        final bytes = await rootBundle.load(defaultAsset);
+        await target.writeAsBytes(bytes.buffer.asUint8List(), flush: true);
+      }
+      final size = await _size(target);
+      if (size == null) return null;
+      return CustomLaunch(
+        kind: LaunchMediaKind.image,
+        path: target.path,
+        width: size.$1,
+        height: size.$2,
+        fit: LaunchFit.fill,
+        backdrop: LaunchBackdrop.auto,
+        bytes: target.lengthSync(),
+      );
+    } catch (_) {
+      return null;
+    }
+  }
+
+  static Future<(int, int)?> _size(File file) async {
+    try {
+      final codec = await instantiateImageCodec(await file.readAsBytes());
+      final frame = await codec.getNextFrame();
+      final size = (frame.image.width, frame.image.height);
+      frame.image.dispose();
+      codec.dispose();
+      return size;
+    } catch (_) {
+      return null;
+    }
   }
 
   /// The stored launch screen (in use or not), or null (none, unreadable, or its file is gone).

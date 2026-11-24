@@ -128,7 +128,7 @@ void main() {
       expect(custom.bytes, png.length);
       expect(platform.cancelled, [asked.request]);
       // Nothing else left behind.
-      expect(dir.listSync().map((e) => e.path), [custom.path]);
+    expect(dir.listSync().map((e) => e.path.replaceAll('\\', '/')), [custom.path.replaceAll('\\', '/')]);
     });
 
     test('a cut-out (transparent edge) sits whole and centred on the launch colour', () async {

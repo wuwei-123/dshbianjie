@@ -67,7 +67,7 @@ void main() {
         expect(calls.last.arguments, {'owner': owner});
         expect(result.$1, isNull);
         expect(old.readAsBytesSync(), fixture);
-        expect(dir.listSync().map((file) => file.path), [old.path]);
+        expect(dir.listSync().map((file) => file.path.replaceAll('\\', '/')), [old.path.replaceAll('\\', '/')]);
         expect(result.$2, switch (code) {
           'empty-selection' => LaunchImportProblem.cancelled,
           'too-large' => LaunchImportProblem.overLimit,

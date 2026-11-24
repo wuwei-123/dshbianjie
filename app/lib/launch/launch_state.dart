@@ -270,7 +270,12 @@ class LaunchController extends ChangeNotifier {
       final snapshot = await LaunchSnapshot.fromMap(await channel.begin());
       if (snapshot == null) return null;
       final stored = await CustomLaunch.load();
-      final custom = stored != null && stored.on ? stored : null;
+      // Only a reopen shows the bundled poster: a cold start already showed the
+      // launcher icon in the system splash, and putting the poster between that
+      // and the first frame is exactly what this build does not want.
+      final custom = stored != null && stored.on
+          ? stored
+          : (snapshot.coldEngine ? null : await CustomLaunch.installDefault());
       final controller = LaunchController(snapshot: snapshot, custom: custom, channel: channel);
       channel.listen(controller.handOver);
       if (custom != null) unawaited(controller.openMedia(screen ?? _screen()));
